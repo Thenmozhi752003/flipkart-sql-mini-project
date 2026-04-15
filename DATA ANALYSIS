@@ -1,0 +1,52 @@
+-- data analysis
+select brand, count(*) as total_models
+from flipkart_mobiles_sales
+group by brand 
+order by total_models desc;
+-- index
+create index idx_brand on flipkart_mobiles_sales(brand);
+alter table flipkart_mobiles_sales modify brand varchar(50);
+show index from flipkart_mobiles_sales;
+select brand,avg(sales_price) as avg_price from flipkart_mobiles_sales group by brand;
+select brand,avg(ratings) as avg_rating from flipkart_mobiles_sales
+group by brand order by avg_rating desc;
+select brand,max(ratings) as max_ratings from flipkart_mobiles_sales
+group by brand  order by max_ratings desc;
+select sales_price,ratings from flipkart_mobiles_sales order by ratings desc;
+select brand,sales_price from flipkart_mobiles_sales
+where sales_price >(select avg(sales_price) from flipkart_mobiles_sales);
+select brand,count(*) as total from flipkart_mobiles_sales group by brand having total>50;
+create table brand_info(brand varchar(50),country varchar(50));
+select * from brand_info;
+insert into brand_info values('APPLE','USA'),('SAMSUNG','South korea'),('XIAOMI','China'),('REALME','China'),('POCO','China');
+select * from brand_info; 
+select distinct f.brand,f.sales_price,b.country from flipkart_mobiles_sales f inner join brand_info b on f.brand=b.brand;
+select b.country,count(*) as total_models from flipkart_mobiles_sales f join brand_info b on f.brand=b.brand group by b.country;
+select b.country,round(avg(f.sales_price),2) as avg_price  from flipkart_mobiles_sales f join brand_info b on f.brand=b.brand group by b.country; 
+select f.brand,f.sales_price,b.country from flipkart_mobiles_sales f left join brand_info b on f.brand=b.brand;
+-- CTE
+with avg_price  as(
+		select avg(sales_price) as avg_value from flipkart_mobiles_sales
+        )
+        select * from flipkart_mobiles_sales, avg_price  where sales_price > avg_value;
+with ranked_data as(
+        select brand,sales_price,row_number() over(partition by brand order by sales_price desc) as rn
+        from flipkart_mobiles_sales
+        )
+        select brand,sales_price
+        from ranked_data 
+        where rn=1;
+select brand,sales_price,
+case
+   when sales_price<20000 then 'budget'
+   when sales_price between 20000 and 50000 then 'mid range'
+   else 'premium'
+end as price_category
+from flipkart_mobiles_sales;
+-- window functions
+select brand,sales_price,ROW_number() over(order by sales_price desc) as rn from flipkart_mobiles_sales;
+select brand,sales_price,rank() over(order by sales_price desc) as rnk from flipkart_mobiles_sales ;
+select brand,sales_price,dense_rank() over(order by sales_price desc) as rnk from flipkart_mobiles_sales;
+-- view
+create view high_price_mobiles as select * from flipkart_mobiles_sales where sales_price>50000;
+select * from high_price_mobiles;
