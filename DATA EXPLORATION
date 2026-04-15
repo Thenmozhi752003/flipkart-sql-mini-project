@@ -1,0 +1,48 @@
+-- Data Exploration
+use flipkart_db;                               
+select * from flipkart_mobiles_sales;    
+select count(*) from flipkart_mobiles_sales;
+DESC flipkart_mobiles_sales;                   
+-- get unique brand names
+select distinct brand,count(*)                 
+from flipkart_mobiles_sales 
+group by brand; 
+-- check the null values      
+select * from flipkart_mobiles_sales where processor is null;
+select brand,Category,base_color,count(*) 
+from flipkart_mobiles_sales 
+group by brand,Category,base_color having count(*)>1;
+
+select min(sales_price),max(sales_price) from flipkart_mobiles_sales;
+-- data cleaning 
+alter table flipkart_mobiles_sales add id int auto_increment primary key;
+select * from flipkart_mobiles_sales;
+select
+sum(case when brand is null then 1 else 0 end) as brand_null,
+sum(case when processor is null then 1 else 0 end) as processor_null,
+sum(case when battery_capacity is null then 1 else 0 end) as BC_null,
+sum(case when Category is null then 1 else 0 end) as cat_null,
+sum(case when base_color is null then 1 else 0 end) as basecolor_null,
+sum(case when screen_size is null then 1 else 0 end) as screensize_null,
+sum(case when ROM is null then 1 else 0 end) as ROM_null,
+sum(case when RAM is null then 1 else 0 end) as RAM_null,
+sum(case when display_size is null then 1 else 0 end) as displaysize_null,
+sum(case when num_rear_camera is null then 1 else 0 end) as rearcamera_null,
+sum(case when sales_price is null then 1 else 0 end) as sp_null,
+sum(case when sales is null then 1 else 0 end) as sales_null
+from flipkart_mobiles_sales;
+select *,count(*) from flipkart_mobiles_sales 
+group by brand,Category,base_color,processor,screen_size,ROM,RAM,display_size,num_front_camera,battery_capacity,ratings,num_of_ratings,sales_price,discount_percent,sales,id 
+having count(*)>1;
+select count(*) - count(distinct id) from flipkart_mobiles_sales;
+select distinct brand from flipkart_mobiles_sales;
+update flipkart_mobiles_sales set brand=upper(brand); 
+select * from flipkart_mobiles_sales; 
+DESC flipkart_mobiles_sales; 
+update flipkart_mobiles_sales set brand=trim(brand);
+select * from flipkart_mobiles_sales; 
+select
+min(sales_price),max(sales_price),avg(sales_price) from flipkart_mobiles_sales; 
+select brand,sales_price 
+from flipkart_mobiles_sales
+order by sales_price desc limit 20;
